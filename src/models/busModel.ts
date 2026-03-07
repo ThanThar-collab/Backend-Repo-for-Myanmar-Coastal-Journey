@@ -1,7 +1,7 @@
-import mongoose, { Date } from 'mongoose';
-
+import mongoose from 'mongoose';
+import { IRoute } from './routeModel';
 export interface IBus {
-    route: mongoose.Schema.Types.ObjectId;
+    route: mongoose.Schema.Types.ObjectId | IRoute;
     noOfSeats: number;
     departureTime: string;
     isAvailable: boolean;

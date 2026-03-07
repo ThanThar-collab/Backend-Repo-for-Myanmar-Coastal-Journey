@@ -1,6 +1,6 @@
 import mongoose, { Types } from "mongoose";
 
-export enum SeatStatus {
+export enum seatStatus {
     Available = 'Available',
     Selected = 'Selected',
     Unavailable = 'Unavailable'
@@ -8,17 +8,15 @@ export enum SeatStatus {
 export interface IBusShow {
     bus: Types.ObjectId;
     ticket: Types.ObjectId;
-    startTime: string;
-    priceMap: Record<string, number>;
+    departureTime: string;
+    price: number;
     seatLayout: {
         row: string;
         seats : {
-            number: number;
-            status: SeatStatus;
+            number: string;
+            status: seatStatus;
         }[];
     }[];
-    selectedBy?: mongoose.Schema.Types.ObjectId;
-    selectedAt?: Date;
 
     createdAt?: Date;
     updatedAt?: Date;
@@ -35,20 +33,37 @@ const busShowSchema = new mongoose.Schema<IBusShow>({
         ref: 'Ticket',
         required: true
     },
-    startTime: {
+    departureTime: {
         type: String,
         required: true
     },
-
-    selectedBy: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+    price: {
+        type: Number,
+        required: true
     },
-    selectedAt: {
-        type: Date,
-    }, 
+    seatLayout: [
+  {
+    row: {
+      type: String,
+      required: true
+    },
+    seats: [
+      {
+        number: {
+          type: String,
+          required: true
+        },
+        status: {
+          type: String,
+          enum: Object.values(seatStatus),
+          default: seatStatus.Available
+        }
+      }
+    ]
+  }
+], 
    },
     { timestamps: true }
 );
 
-export const Seat = mongoose.model('Seat', busShowSchema);
+export const Show = mongoose.model('Show', busShowSchema);

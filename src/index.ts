@@ -15,6 +15,7 @@ import cityRouter from './routes/cityRoute';
 import routesRouter from './routes/routesRoute';
 import busRouter from './routes/busRoute';
 import ticketRouter from './routes/ticketRoute';
+import busSeatShowRouter from './routes/busSeatShowRoute';
 
 dotenv.config();
 
@@ -39,6 +40,7 @@ app.use('/api/v1/cities',cityRouter); //city endpoints
 app.use('/api/v1/buses',busRouter); //bus endpoints
 app.use('/api/v1/routes',routesRouter); //route endpoints
 app.use('/api/v1/tickets',ticketRouter); //ticket endpoints
+app.use('/api/v1/bus-seats', busSeatShowRouter); //bus seat endpoints
 
 
 //serve static files from uploads and assets dir
