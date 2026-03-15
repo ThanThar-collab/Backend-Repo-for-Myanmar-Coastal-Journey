@@ -118,49 +118,6 @@ npm start
 
 For full API reference (Data | Endpoint | Notes) for the frontend team, see **[API.md](API.md)**.
 
-```
-# Authentication
-
-Register User (Local: NRC required | Foreign: Passport required | dateOfBirth required, 12+ only)
-POST http://localhost:3000/api/v1/auth/register
-
-Login User
-POST http://localhost:3000/api/v1/auth/login
-
-Logout User
-POST http://localhost:3000/api/v1/auth/logout
-
-Refresh Token
-POST http://localhost:3000/api/v1/auth/refresh-token
-
-# User CRUD
-
-Get All Users
-GET http://localhost:3000/api/v1/auth/users
-
-Get User (Param: Id)
-GET http://localhost:3000/api/v1/auth/users/:id
-
-Update User
-PUT http://localhost:3000/api/v1/auth/users/:id
-
-Delete User
-DELETE http://localhost:3000/api/v1/auth/users/:id
-
-# Beaches & Regions
-
-Create Region
-POST http://localhost:3000/api/v1/beaches/regions
-
-Create Beach
-POST http://localhost:3000/api/v1/beaches
-
-# Bus Seat Booking (requires user 12+)
-
-Update Seat Status (select/release seat)
-PUT http://localhost:3000/api/v1/bus-seats/:showId/seat?row=A&seatNumber=1&status=Selected
-```
-
 ### User types
 
 - **Local users** (`isForeigner: false`): NRC required (Myanmar format), phone must start with `09`
