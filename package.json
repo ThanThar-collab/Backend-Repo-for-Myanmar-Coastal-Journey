@@ -1,5 +1,5 @@
 {
-  "name": "package.json",
+  "name": "myanmar-coastal-journey-backend",
   "version": "1.0.0",
   "description": "a backend repository for the Myanmar Coastal Journey mobile app for special project of MIIT Students in 2025-2026 academic year",
   "main": "index.js",
