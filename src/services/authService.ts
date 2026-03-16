@@ -40,13 +40,13 @@ export const registerUserService = async (data: CreateUserType) => {
 
   const savedUser = await user.save();
 
-  const html = emailVerificationTemplate.replace('{verifyCode}', verifyToken);
-  await mailtrapClient.send({
-    from: mailtrapSender,
-    to: [{ email: data.email }],
-    subject: 'Verify Your Email!',
-    html,
-  });
+  // const html = emailVerificationTemplate.replace('{verifyCode}', verifyToken);
+  // await mailtrapClient.send({
+  //   from: mailtrapSender,
+  //   to: [{ email: data.email }],
+  //   subject: 'Verify Your Email!',
+  //   html,
+  // });
 
   return savedUser;
 };

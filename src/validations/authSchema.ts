@@ -41,7 +41,8 @@ export const CreateUserSchema = z
       .optional(),
     password: z
     .string()
-    .min(8, 'Password must be at least 8 characters'),
+    .min(8, 'Password must be at least 8 characters')
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/, 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'),
   confirmPassword: z
     .string()
     .min(8, 'Password must be at least 8 characters'),
@@ -113,7 +114,7 @@ export const UpdateUserSchema = z
       .min(6)
       .max(20)
       .optional(),
-    password: z.string().min(8, 'Password must be at least 8 characters').optional(),
+    password: z.string().min(8, 'Password must be at least 8 characters').regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/, 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character').optional(),
     dateOfBirth: z.coerce.date().optional(),
     userRole: z.enum(USER_ROLES).optional(),
     phone: z.string().min(7).optional(),

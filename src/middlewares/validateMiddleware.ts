@@ -18,7 +18,18 @@ export const validate = (schema: ZodSchema, target: ValidationTarget = 'body') =
       });
     }
 
-    req[target] = result.data;
+    // Avoid assigning directly to properties like `req.query` which may be defined via getters.
+    // Instead, merge validated data into the existing object when possible.
+    if (target === 'body') {
+      (req as any).body = result.data;
+    } else {
+      const current = (req as any)[target];
+      if (current && typeof current === 'object') {
+        Object.assign(current, result.data);
+      } else {
+        (req as any)[target] = result.data;
+      }
+    }
     next();
   };
 };

@@ -12,7 +12,7 @@ import {
 import { limiter } from '../lib/expressRateLimit';
 import { authenticateToken } from '../middlewares/authMiddleware';
 import { validate } from '../middlewares/validateMiddleware';
-import { CreateUserSchema, LogInSchema, objectIdSchema } from '../validations/authSchema';
+import { CreateUserSchema, LogInSchema, objectIdSchema, UpdateUserSchema } from '../validations/authSchema';
 import { z } from 'zod';
 
 const authRouter = Router();

@@ -30,3 +30,32 @@ export const getAllRoute = asyncHandler(async (req: Request, res: Response) => {
     ...result,
   });
 });
+
+export const getRouteById = asyncHandler(async (req: Request, res: Response) => {
+  const route = await getRouteByIdService(req.params.id);
+  res.status(200).json({
+    success: true,
+    status: 200,
+    message: 'Route Displayed',
+    data: route,
+  });
+});
+
+export const updateRoute = asyncHandler(async (req: Request, res: Response) => {
+  const route = await updateRouteService(req.params.id, req.body);
+  res.status(200).json({
+    success: true,
+    status: 200,
+    message: 'Route Updated Successfully',
+    data: route,
+  });
+});
+
+export const deleteRoute = asyncHandler(async (req: Request, res: Response) => {
+  await deleteRouteService(req.params.id);
+  res.status(200).json({
+    success: true,
+    status: 200,
+    message: 'Route Deleted Successfully',
+  });
+});

@@ -34,8 +34,11 @@ Protected endpoints require the header: **`Authorization: Bearer <access_token>`
 
 | Data | Endpoint | Notes |
 |------|----------|--------|
-| List all cities | **GET** `/api/v1/cities` | Bearer required. Use response `data[].cityName` (and `_id`) for “From” dropdown (e.g. Yangon). |
+| List all cities | **GET** `/api/v1/cities` | Bearer required. Query: `page`, `limit` (pagination). Use response `data[].cityName` (and `_id`) for “From” dropdown (e.g. Yangon). |
+| Get city by ID | **GET** `/api/v1/cities/:id` | Bearer required. Params: `id` = city ObjectId. |
 | Create a city | **POST** `/api/v1/cities` | Bearer required. Body (JSON): `{ "cityName": "Yangon" }`. |
+| Update city | **PUT** `/api/v1/cities/:id` | Bearer required. Params: `id` = city ObjectId. Body: `{ "cityName": "New name" }`. |
+| Delete city | **DELETE** `/api/v1/cities/:id` | Bearer required. Params: `id` = city ObjectId. |
 
 ---
 
@@ -43,9 +46,14 @@ Protected endpoints require the header: **`Authorization: Bearer <access_token>`
 
 | Data | Endpoint | Notes |
 |------|----------|--------|
-| List all beaches | **GET** `/api/v1/beaches` | Bearer required. Use response `data[].beachName` (and `_id`) for “To” dropdown (e.g. Ngapali, Chaung Tha). Each item may include populated `region`. |
+| List all beaches | **GET** `/api/v1/beaches` | Bearer required. Query: `page`, `limit` (pagination). Use response `data[].beachName` (and `_id`) for “To” dropdown (e.g. Ngapali, Chaung Tha). Each item may include populated `region`. |
+| Get beach by ID | **GET** `/api/v1/beaches/:id` | Bearer required. Params: `id` = beach ObjectId. |
 | Create a region | **POST** `/api/v1/beaches/regions` | Bearer required. Body (JSON): `{ "regionName": "Tanintharyi" }`. |
+| Update region | **PUT** `/api/v1/beaches/regions/:id` | Bearer required. Params: `id` = region ObjectId. Body: `{ "regionName": "New name" }`. |
+| Delete region | **DELETE** `/api/v1/beaches/regions/:id` | Bearer required. Params: `id` = region ObjectId. |
 | Create a beach | **POST** `/api/v1/beaches` | Bearer required. Body (JSON): `beachName`, `region` (ObjectId), `currentSafe` (boolean), `imageUrl` (array of URL strings). |
+| Update beach | **PUT** `/api/v1/beaches/:id` | Bearer required. Params: `id` = beach ObjectId. Body: partial `beachName`, `region`, `currentSafe`, `imageUrl` (array of URLs). At least one field required. |
+| Delete beach | **DELETE** `/api/v1/beaches/:id` | Bearer required. Params: `id` = beach ObjectId. |
 | Upload beach images | **POST** `/api/v1/beaches/upload-image` | Bearer required. Body: **form-data**, key `image` (file); max 5 files. Returns array of image URLs. |
 
 ---
@@ -66,10 +74,13 @@ Protected endpoints require the header: **`Authorization: Bearer <access_token>`
 
 | Data | Endpoint | Notes |
 |------|----------|--------|
-| List all buses | **GET** `/api/v1/buses` | Bearer required. Returns buses with populated `route` (source/destination). Use to show available buses. |
-| Filter buses by departure time & availability | **GET** `/api/v1/buses/filter/op1?departureTime=...&isAvailable=true` | Bearer required. Query: `departureTime` (string), `isAvailable` (`"true"` or `"false"`). Use when user filters by time/availability. |
-| Filter buses by source city and destination beach | **GET** `/api/v1/buses/filter/op2?source=Yangon&destination=Ngapali` | Bearer required. Query: `source` (city name), `destination` (beach name). Use for “From (city) → To (beach)” bus list. |
+| List all buses | **GET** `/api/v1/buses` | Bearer required. Query: `page`, `limit` (pagination). Returns buses with populated `route` (source/destination). Use to show available buses. |
+| Filter buses by departure time & availability | **GET** `/api/v1/buses/filter/op1?departureTime=...&isAvailable=true` | Bearer required. Query: `departureTime` (string), `isAvailable` (`"true"` or `"false"`), `page`, `limit`. Use when user filters by time/availability. |
+| Filter buses by source city and destination beach | **GET** `/api/v1/buses/filter/op2?source=Yangon&destination=Ngapali` | Bearer required. Query: `source` (city name), `destination` (beach name), `page`, `limit`. Use for “From (city) → To (beach)” bus list. |
+| Get bus by ID | **GET** `/api/v1/buses/:id` | Bearer required. Params: `id` = bus ObjectId. |
 | Create a bus | **POST** `/api/v1/buses` | Bearer required. Body (JSON): `route` (ObjectId), `noOfSeats`, `departureTime`, `isAvailable` (boolean). |
+| Update bus | **PUT** `/api/v1/buses/:id` | Bearer required. Params: `id` = bus ObjectId. Body: partial `route`, `noOfSeats`, `departureTime`, `isAvailable`. At least one field required. |
+| Delete bus | **DELETE** `/api/v1/buses/:id` | Bearer required. Params: `id` = bus ObjectId. |
 
 ---
 
@@ -77,10 +88,12 @@ Protected endpoints require the header: **`Authorization: Bearer <access_token>`
 
 | Data | Endpoint | Notes |
 |------|----------|--------|
-| List all tickets | **GET** `/api/v1/tickets` | Bearer required. Returns all tickets. Use for admin or full list. |
-| Search tickets by source & destination (bus ticket search) | **GET** `/api/v1/tickets/filter/op1?source=Yangon&destination=Ngapali` | Bearer required. Query: `source` (city name), `destination` (beach name). Use for ticket search form: “From” (city) + “To” (beach). Response includes `departureDate`, `noOfPassenger`, `isForeigner` (Local = false, Foreigner = true), and populated `busId`. |
+| List all tickets | **GET** `/api/v1/tickets` | Bearer required. Query: `page`, `limit` (pagination). Returns tickets; use for admin or full list. |
+| Search tickets by source & destination (bus ticket search) | **GET** `/api/v1/tickets/filter/op1?source=Yangon&destination=Ngapali` | Bearer required. Query: `source` (city name), `destination` (beach name), `page`, `limit`. Use for ticket search form: “From” (city) + “To” (beach). Response includes `departureDate`, `noOfPassenger`, `isForeigner` (Local = false, Foreigner = true), and populated `busId`. |
 | Get one ticket by ID | **GET** `/api/v1/tickets/:id` | Bearer required. Params: `id` = ticket ObjectId. Use before payment or booking details. |
 | Create a ticket | **POST** `/api/v1/tickets` | Bearer required. Body (JSON): `ticketName` (optional), `busId` (ObjectId), `source`, `destination`, `departureDate` (ISO date), `ticketPrice`, `noOfPassenger` (default 1), `isForeigner` (default false). |
+| Update ticket | **PUT** `/api/v1/tickets/:id` | Bearer required. Params: `id` = ticket ObjectId. Body: partial `ticketName`, `busId`, `source`, `destination`, `departureDate`, `ticketPrice`, `noOfPassenger`, `isForeigner`. At least one field required. |
+| Delete ticket | **DELETE** `/api/v1/tickets/:id` | Bearer required. Params: `id` = ticket ObjectId. |
 
 ---
 
