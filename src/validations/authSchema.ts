@@ -6,22 +6,22 @@ export { objectIdSchema };
 
 // User roles as tuple for z.enum (Zod v4 compatibility)
 const USER_ROLES = [USEROLES.Admin, USEROLES.Client] as const;
+const nrcRegex = /^(?:[1-9]|1[0-4])\/[A-Z]{3,}\((?:N|P|E)\)\d{6}$/;
+const passportRegex = /^[A-Za-z0-9]{6,20}$/;
 
 export const LogInSchema = z.object({
     email: z
     .email()
     .refine(val => val.endsWith("@gmail.com"), {
-      message: "Email must end with '@gmail.com' "
+      message: "Invalid email address"
     }),
     password: z
     .string()
-    .min(8, 'Password must be at least 8 characters'),
+    .min(8, 'Password must be at least 8 characters')
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/, 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'),
 });
 
-const nrcRegex = /^(?:[1-9]|1[0-4])\/[A-Z]{3,}\((?:N|P|E)\)\d{6}$/;
 // Passport: alphanumeric, 6-20 chars (international formats vary)
-const passportRegex = /^[A-Za-z0-9]{6,20}$/;
-
 export const CreateUserSchema = z
   .object({
     name: z.string().min(3, 'Username is required'),

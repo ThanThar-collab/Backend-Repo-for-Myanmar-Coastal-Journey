@@ -31,6 +31,13 @@ export const getBusShowByIdService = async (id: string) => {
   return show;
 };
 
+export const getAllBusShowsService = async () => {
+  return Show.find()
+    .sort({ createdAt: -1 })
+    .populate('bus')
+    .populate('ticket');
+};
+
 export const updateSeatService = async (
   showId: string,
   row: string,

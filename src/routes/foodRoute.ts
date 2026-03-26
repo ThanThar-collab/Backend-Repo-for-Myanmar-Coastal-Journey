@@ -27,7 +27,7 @@ router.get(
   validate(filterFoodByRestaurantQuerySchema, 'query'),
   filterFoodByRestaurant
 );
-// GET/PUT/DELETE /foods/item/:id = single food by food id (must be before /:id)
+//single food by food id
 router.get('/item/:id', authenticateToken, validate(getFoodByIdParamsSchema, 'params'), getFoodById);
 router.put('/item/:id', authenticateToken, validate(getFoodByIdParamsSchema, 'params'), validate(updateFoodSchema, 'body'), updateFood);
 router.delete('/item/:id', authenticateToken, validate(getFoodByIdParamsSchema, 'params'), deleteFood);

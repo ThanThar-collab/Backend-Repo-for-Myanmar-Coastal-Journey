@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import asyncHandler from 'express-async-handler';
 import {
   createBusShowService,
+  getAllBusShowsService,
   getBusShowByIdService,
   updateSeatService,
   updateBusShowService,
@@ -16,6 +17,16 @@ export const createBusShow = asyncHandler(async (req: Request, res: Response) =>
     status: 201,
     message: 'Seat show created successfully',
     data: newShow,
+  });
+});
+
+export const getAllBusShows = asyncHandler(async (_req: Request, res: Response) => {
+  const shows = await getAllBusShowsService();
+  res.status(200).json({
+    success: true,
+    status: 200,
+    message: 'Bus Seat Shows Displayed',
+    data: shows,
   });
 });
 

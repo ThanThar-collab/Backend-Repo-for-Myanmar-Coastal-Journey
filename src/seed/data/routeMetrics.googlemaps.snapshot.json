@@ -1,0 +1,14 @@
+{
+  "Yangon__Chaung Thar": {
+    "distanceMiles": 130,
+    "durationMins": 330,
+    "source": "google-maps",
+    "updatedAtISO": "2026-03-26T00:00:00.000Z"
+  },
+  "Yangon__Ngwe Saung": {
+    "distanceMiles": 120,
+    "durationMins": 300,
+    "source": "google-maps",
+    "updatedAtISO": "2026-03-26T00:00:00.000Z"
+  }
+}

@@ -35,7 +35,7 @@ export const getFoodByRestaurantId = asyncHandler(async (req: Request, res: Resp
 export const filterFoodByRestaurant = asyncHandler(async (req: Request, res: Response) => {
   const query = req.query as unknown as { restaurantName: string; page: number; limit: number; sortBy?: string; sortOrder?: 'asc' | 'desc' };
   const result = await filterFoodsByRestaurantNameService(
-    { restaurantName: query.restaurantName },
+    { restaurantName: query.restaurantName, page: query.page ?? 1, limit: query.limit ?? 10, sortBy: query.sortBy, sortOrder: query.sortOrder ?? 'asc' },
     { page: query.page ?? 1, limit: query.limit ?? 10, sortBy: query.sortBy, sortOrder: query.sortOrder ?? 'asc' }
   );
 

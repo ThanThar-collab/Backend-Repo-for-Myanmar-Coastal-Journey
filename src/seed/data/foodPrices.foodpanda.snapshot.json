@@ -1,0 +1,22 @@
+{
+  "Fried Rice": { "minMMK": 2500, "maxMMK": 6500 },
+  "Shan Noodles": { "minMMK": 2500, "maxMMK": 7000 },
+  "Mohinga": { "minMMK": 2000, "maxMMK": 5000 },
+  "Tea Leaf Salad": { "minMMK": 2500, "maxMMK": 7000 },
+  "Grilled Fish": { "minMMK": 7000, "maxMMK": 16000 },
+  "Chicken Curry": { "minMMK": 4000, "maxMMK": 12000 },
+  "Pork Curry": { "minMMK": 4000, "maxMMK": 13000 },
+  "Seafood Soup": { "minMMK": 5000, "maxMMK": 14000 },
+  "Fried Noodles": { "minMMK": 2500, "maxMMK": 7000 },
+  "Hot Pot Set": { "minMMK": 12000, "maxMMK": 28000 },
+  "BBQ Skewers": { "minMMK": 3000, "maxMMK": 12000 },
+  "Coconut Rice": { "minMMK": 2500, "maxMMK": 7000 },
+  "Burmese Salad": { "minMMK": 2500, "maxMMK": 8000 },
+  "Spring Rolls": { "minMMK": 2500, "maxMMK": 8000 },
+  "Fresh Juice": { "minMMK": 2000, "maxMMK": 6000 },
+  "Milk Tea": { "minMMK": 1500, "maxMMK": 4000 },
+  "Coffee": { "minMMK": 2000, "maxMMK": 6000 },
+  "Dessert": { "minMMK": 2000, "maxMMK": 9000 },
+  "Seafood Platter": { "minMMK": 15000, "maxMMK": 40000 },
+  "Fried Prawns": { "minMMK": 9000, "maxMMK": 22000 }
+}

@@ -12,6 +12,8 @@ export const getBusShowByIdParamsSchema = z.object({
   id: objectIdSchema,
 });
 
+export const getAllBusShowsQuerySchema = z.object({}).strict();
+
 export const updateSeatStatusParamsSchema = z.object({
   showId: objectIdSchema,
 });

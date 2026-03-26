@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import {
   createBusShow,
+  getAllBusShows,
   getBusShowById,
   updateSeatStatus,
   updateBusShow,
@@ -11,6 +12,7 @@ import { validate } from '../middlewares/validateMiddleware';
 import {
   createBusShowSchema,
   updateBusShowSchema,
+  getAllBusShowsQuerySchema,
   getBusShowByIdParamsSchema,
   updateSeatStatusParamsSchema,
   updateSeatStatusQuerySchema,
@@ -19,6 +21,7 @@ import {
 const busSeatShowRouter = Router();
 
 busSeatShowRouter.post('/', authenticateToken, validate(createBusShowSchema, 'body'), createBusShow);
+busSeatShowRouter.get('/', authenticateToken, validate(getAllBusShowsQuerySchema, 'query'), getAllBusShows);
 busSeatShowRouter.get('/:id', authenticateToken, validate(getBusShowByIdParamsSchema, 'params'), getBusShowById);
 busSeatShowRouter.put(
   '/:id',

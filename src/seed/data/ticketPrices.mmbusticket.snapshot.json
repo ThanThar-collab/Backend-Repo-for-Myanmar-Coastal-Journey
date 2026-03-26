@@ -1,0 +1,8 @@
+{
+  "Yangon__Chaung Thar": { "localMMK": 18000, "foreignerMMK": 20000 },
+  "Yangon__Ngwe Saung": { "localMMK": 17000, "foreignerMMK": 19000 },
+  "Yangon__Ngapali": { "localMMK": 45000, "foreignerMMK": 50000 },
+
+  "Mandalay__Ngapali": { "localMMK": 52000, "foreignerMMK": 58000 },
+  "Naypyitaw__Ngapali": { "localMMK": 47000, "foreignerMMK": 52000 }
+}
