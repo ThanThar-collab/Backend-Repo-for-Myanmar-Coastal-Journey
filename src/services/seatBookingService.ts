@@ -1,5 +1,6 @@
 import { Types } from 'mongoose';
 import { Show, seatStatus, type IBusShow } from '../models/busBookingShowModel';
+import { BusSeatPurchase } from '../models/busSeatPurchaseModel';
 
 export const BOOKING_CURRENCY = 'MMK' as const;
 
@@ -103,10 +104,18 @@ export const toggleSeatsSelectionService = async (
  * After successful payment: mark seats as Unavailable so other users see them as taken.
  * Only seats currently Selected by this user can be confirmed.
  */
+export type ConfirmSeatsPassengerMeta = {
+  passengerName?: string;
+  passengerNrc?: string;
+  transportType?: 'Bus' | 'Flight';
+  ticketLabel?: string;
+};
+
 export const confirmSeatsAfterPaymentService = async (
   showId: string,
   userId: string,
-  seatIds: string[]
+  seatIds: string[],
+  passenger?: ConfirmSeatsPassengerMeta
 ) => {
   const show = await Show.findById(showId);
   if (!show) throw new Error('Invalid Bus ShowId. Wrong Parameter Passed');
@@ -144,5 +153,34 @@ export const confirmSeatsAfterPaymentService = async (
     currency: BOOKING_CURRENCY,
   };
 
-  return { show: populated, booking };
+  const ticketDoc = populated.ticket as unknown;
+  if (!ticketDoc || typeof ticketDoc !== 'object') {
+    throw new Error('Ticket data missing for this show');
+  }
+  const t = ticketDoc as {
+    source?: string;
+    destination?: string;
+    departureDate?: Date | string;
+    ticketName?: string;
+  };
+  const travelDate =
+    t.departureDate != null ? new Date(t.departureDate as Date | string) : new Date();
+
+  const purchase = await BusSeatPurchase.create({
+    user: userId,
+    show: showId,
+    seatIds: [...seatIds].sort(),
+    totalPrice: booking.totalPrice,
+    currency: BOOKING_CURRENCY,
+    source: String(t.source ?? ''),
+    destination: String(t.destination ?? ''),
+    departureTime: populated.departureTime,
+    travelDate,
+    ticketLabel: passenger?.ticketLabel ?? t.ticketName,
+    transportType: passenger?.transportType ?? 'Bus',
+    passengerName: passenger?.passengerName,
+    passengerNrc: passenger?.passengerNrc,
+  });
+
+  return { show: populated, booking, purchase };
 };

@@ -1,5 +1,5 @@
 import * as z from 'zod';
-import { objectIdSchema } from './commonSchema';
+import { objectIdSchema, paginationQuerySchema } from './commonSchema';
 import { seatStatus } from '../models/busBookingShowModel';
 
 export const createBusShowSchema = z.object({
@@ -39,7 +39,13 @@ export const toggleSeatSelectionBodySchema = z.object({
 
 export const confirmSeatsBodySchema = z.object({
   seatIds: z.array(busSeatIdSchema).min(1, 'At least one seat id is required'),
+  passengerName: z.string().trim().min(1).optional(),
+  passengerNrc: z.string().trim().min(1).optional(),
+  transportType: z.enum(['Bus', 'Flight']).optional(),
+  ticketLabel: z.string().trim().min(1).optional(),
 });
+
+export const listBusSeatPurchasesQuerySchema = paginationQuerySchema;
 
 export const updateBusShowSchema = z.object({
   departureTime: z.string().min(1).optional(),

@@ -12,6 +12,8 @@ import {
   toggleSeatsSelectionService,
   confirmSeatsAfterPaymentService,
 } from '../services/seatBookingService';
+import { listBusSeatPurchasesForUserService } from '../services/busSeatPurchaseService';
+import { parsePagination } from '../validations/commonSchema';
 import { seatStatus } from '../models/busBookingShowModel';
 
 export const createBusShow = asyncHandler(async (req: Request, res: Response) => {
@@ -70,15 +72,42 @@ export const confirmSeatsBooking = asyncHandler(async (req: Request, res: Respon
     return;
   }
   const { showId } = req.params as { showId: string };
-  const { seatIds } = req.body as { seatIds: string[] };
+  const { seatIds, passengerName, passengerNrc, transportType, ticketLabel } = req.body as {
+    seatIds: string[];
+    passengerName?: string;
+    passengerNrc?: string;
+    transportType?: 'Bus' | 'Flight';
+    ticketLabel?: string;
+  };
 
-  const { show, booking } = await confirmSeatsAfterPaymentService(showId, userId, seatIds);
+  const { show, booking, purchase } = await confirmSeatsAfterPaymentService(
+    showId,
+    userId,
+    seatIds,
+    { passengerName, passengerNrc, transportType, ticketLabel }
+  );
 
   res.status(200).json({
     success: true,
     status: 200,
     message: 'Seats booked successfully',
-    data: { show, booking },
+    data: { show, booking, purchase },
+  });
+});
+
+export const getMyBusSeatPurchases = asyncHandler(async (req: Request, res: Response) => {
+  const userId = req.userId;
+  if (!userId) {
+    res.status(401).json({ success: false, message: 'Unauthorized' });
+    return;
+  }
+  const pagination = parsePagination(req.query);
+  const result = await listBusSeatPurchasesForUserService(userId, pagination);
+  res.status(200).json({
+    success: true,
+    status: 200,
+    message: 'Bus seat purchases displayed',
+    ...result,
   });
 });
 
