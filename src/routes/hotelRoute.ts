@@ -21,21 +21,23 @@ import {
 
 const hotelRouter = Router();
 
-hotelRouter.post('/', authenticateToken, validate(createHotelSchema, 'body'), createHotel);
-hotelRouter.get('/', authenticateToken, validate(listHotelsQuerySchema, 'query'), getAllHotels);
+/** Public catalog: browse by beach name (mobile app). */
+hotelRouter.get(
+  '/filter/beach-name',
+  validate(hotelsByBeachNameQuerySchema, 'query'),
+  getHotelsByBeachName
+);
 hotelRouter.get(
   '/filter/beach',
   authenticateToken,
   validate(hotelsByBeachQuerySchema, 'query'),
   getHotelsByBeach
 );
-hotelRouter.get(
-  '/filter/beach-name',
-  authenticateToken,
-  validate(hotelsByBeachNameQuerySchema, 'query'),
-  getHotelsByBeachName
-);
-hotelRouter.get('/:id', authenticateToken, validate(getHotelByIdParamsSchema, 'params'), getHotelById);
+
+hotelRouter.post('/', authenticateToken, validate(createHotelSchema, 'body'), createHotel);
+hotelRouter.get('/', authenticateToken, validate(listHotelsQuerySchema, 'query'), getAllHotels);
+/** Public catalog: hotel detail (must stay after /filter/* routes). */
+hotelRouter.get('/:id', validate(getHotelByIdParamsSchema, 'params'), getHotelById);
 hotelRouter.put(
   '/:id',
   authenticateToken,

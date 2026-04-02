@@ -48,15 +48,19 @@ export const searchTravelPackagesService = async (
   const end = new Date(start);
   end.setDate(end.getDate() + 1);
 
-  const filter = {
+  const routeFilter = {
     isActive: true,
     fromCity: fromCity._id,
     toBeach: toBeach._id,
+  } as const;
+
+  const exactDateFilter = {
+    ...routeFilter,
     departOnDate: { $gte: start, $lt: end },
   };
 
-  const [data, total] = await Promise.all([
-    TravelPackage.find(filter)
+  let [data, total] = await Promise.all([
+    TravelPackage.find(exactDateFilter)
       .populate('fromCity', 'cityName')
       .populate('toBeach', 'beachName')
       .populate('busTicket.ticket')
@@ -65,8 +69,24 @@ export const searchTravelPackagesService = async (
       .skip(skip)
       .limit(limit)
       .lean(),
-    TravelPackage.countDocuments(filter),
+    TravelPackage.countDocuments(exactDateFilter),
   ]);
+
+  // UX fallback: when selected date has no package, still show route packages.
+  if (total === 0) {
+    [data, total] = await Promise.all([
+      TravelPackage.find(routeFilter)
+        .populate('fromCity', 'cityName')
+        .populate('toBeach', 'beachName')
+        .populate('busTicket.ticket')
+        .populate('hotel.hotel', 'hotelName beach hotelRating')
+        .sort({ departOnDate: 1, ...sort })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      TravelPackage.countDocuments(routeFilter),
+    ]);
+  }
 
   return { data, total, page, limit, totalPages: Math.ceil(total / limit) };
 };

@@ -25,9 +25,25 @@ import {
 
 const beachRouter = Router();
 
-beachRouter.post('/regions', authenticateToken, validate(createRegionSchema, 'body'), createRegion);
-beachRouter.put('/regions/:id', authenticateToken, validate(getRegionByIdParamsSchema, 'params'), validate(updateRegionSchema, 'body'), updateRegion);
-beachRouter.delete('/regions/:id', authenticateToken, validate(getRegionByIdParamsSchema, 'params'), deleteRegion);
+beachRouter.post(
+  '/regions',
+  authenticateToken,
+  validate(createRegionSchema, 'body'),
+  createRegion
+);
+beachRouter.put(
+  '/regions/:id',
+  authenticateToken,
+  validate(getRegionByIdParamsSchema, 'params'),
+  validate(updateRegionSchema, 'body'),
+  updateRegion
+);
+beachRouter.delete(
+  '/regions/:id',
+  authenticateToken,
+  validate(getRegionByIdParamsSchema, 'params'),
+  deleteRegion
+);
 
 beachRouter.post(
   '/upload-image',
@@ -36,10 +52,36 @@ beachRouter.post(
   imageUploadController
 );
 
-beachRouter.post('/', authenticateToken, validate(createBeachSchema, 'body'), createBeach);
-beachRouter.get('/', authenticateToken, validate(listBeachesQuerySchema, 'query'), getAllBeach);
-beachRouter.get('/:id', authenticateToken, validate(getBeachByIdParamsSchema, 'params'), getBeachById);
-beachRouter.put('/:id', authenticateToken, validate(getBeachByIdParamsSchema, 'params'), validate(updateBeachSchema, 'body'), updateBeach);
-beachRouter.delete('/:id', authenticateToken, validate(getBeachByIdParamsSchema, 'params'), deleteBeach);
+beachRouter.post(
+  '/',
+  authenticateToken,
+  validate(createBeachSchema, 'body'),
+  createBeach
+);
+beachRouter.get(
+  '/',
+  authenticateToken,
+  validate(listBeachesQuerySchema, 'query'),
+  getAllBeach
+);
+beachRouter.get(
+  '/:id',
+  authenticateToken,
+  validate(getBeachByIdParamsSchema, 'params'),
+  getBeachById
+);
+beachRouter.put(
+  '/:id',
+  authenticateToken,
+  validate(getBeachByIdParamsSchema, 'params'),
+  validate(updateBeachSchema, 'body'),
+  updateBeach
+);
+beachRouter.delete(
+  '/:id',
+  authenticateToken,
+  validate(getBeachByIdParamsSchema, 'params'),
+  deleteBeach
+);
 
 export default beachRouter;

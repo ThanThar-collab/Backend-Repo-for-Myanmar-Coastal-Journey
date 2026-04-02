@@ -36,6 +36,35 @@ export const getAllRoomsService = async (pagination: PaginationQuery) => {
   };
 };
 
+export const getRoomsByHotelService = async (
+  hotelId: string,
+  pagination: PaginationQuery
+) => {
+  const { page, limit, sortBy = 'roomPricePerNight', sortOrder } = pagination;
+  const skip = (page - 1) * limit;
+  const sort: Record<string, 1 | -1> = { [sortBy]: sortOrder === 'desc' ? -1 : 1 };
+
+  const filter = { hotel: hotelId } as any;
+
+  const [data, total] = await Promise.all([
+    Room.find(filter)
+      .populate('hotel', 'hotelName beach')
+      .sort(sort)
+      .skip(skip)
+      .limit(limit)
+      .lean(),
+    Room.countDocuments(filter),
+  ]);
+
+  return {
+    data,
+    total,
+    page,
+    limit,
+    totalPages: Math.ceil(total / limit),
+  };
+};
+
 export const getRoomsByRoomTypeService = async (
   roomType: RoomTypes,
   pagination: PaginationQuery

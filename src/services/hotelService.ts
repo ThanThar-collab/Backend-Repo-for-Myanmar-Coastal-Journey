@@ -1,5 +1,6 @@
 import { Hotel } from '../models/hotelModel';
 import { Beach } from '../models/beachModel';
+import { Room } from '../models/roomModel';
 import type { CreateHotelInput, UpdateHotelInput } from '../validations/hotelSchema';
 import type { PaginationQuery } from '../validations/commonSchema';
 
@@ -81,8 +82,27 @@ export const getHotelsByBeachNameService = async (
     Hotel.countDocuments(filter),
   ]);
 
+  const hotelIds = (data as any[]).map((h) => h._id);
+  let minByHotel = new Map<string, number>();
+  if (hotelIds.length > 0) {
+    const rooms = await Room.find({ hotel: { $in: hotelIds } })
+      .select('hotel roomPricePerNight')
+      .lean();
+    for (const r of rooms as any[]) {
+      const hid = r.hotel.toString();
+      const p = r.roomPricePerNight as number;
+      const cur = minByHotel.get(hid);
+      if (cur === undefined || p < cur) minByHotel.set(hid, p);
+    }
+  }
+
+  const dataWithMin = (data as any[]).map((h) => ({
+    ...h,
+    minRoomPrice: minByHotel.get(h._id.toString()) ?? null,
+  }));
+
   return {
-    data,
+    data: dataWithMin,
     total,
     page,
     limit,

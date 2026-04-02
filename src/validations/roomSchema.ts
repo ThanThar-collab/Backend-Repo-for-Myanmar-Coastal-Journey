@@ -19,6 +19,12 @@ export const roomsByRoomTypeQuerySchema = z.object({
   roomType: z.nativeEnum(RoomTypes),
 }).merge(paginationQuerySchema);
 
+export const roomsByHotelQuerySchema = z
+  .object({
+    hotelId: objectIdSchema,
+  })
+  .merge(paginationQuerySchema);
+
 export const updateRoomSchema = z
   .object({
     hotel: objectIdSchema.optional(),

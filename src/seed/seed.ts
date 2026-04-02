@@ -19,14 +19,20 @@ import { Show } from '../models/busBookingShowModel';
 import { generateSeatLayout } from '../lib/busSeatIndex';
 import { Hotel } from '../models/hotelModel';
 import { Room, RoomTypes } from '../models/roomModel';
-import { TourGuide, TourGuideAvailability, TourGuideGender } from '../models/tourGuideModel';
+import {
+  TourGuide,
+  TourGuideAvailability,
+  TourGuideGender,
+} from '../models/tourGuideModel';
 import { TravelPackage } from '../models/travelPackageModel';
 import { TravelPackageBooking } from '../models/travelPackageBookingModel';
 import { TourGuideBooking } from '../models/tourGuideBookingModel';
+import { SEED_BEACH_NAMES, SEED_CITY_NAMES } from '../constants/travelSeedPlaces';
 
 const toBool = (v: string | undefined) => v?.toLowerCase() === 'true';
 
-const clamp = (n: number, min: number, max: number) => Math.max(min, Math.min(max, n));
+const clamp = (n: number, min: number, max: number) =>
+  Math.max(min, Math.min(max, n));
 
 const roundTo = (n: number, step: number) => Math.round(n / step) * step;
 
@@ -42,45 +48,13 @@ const uniqueBy = <T>(items: T[], key: (t: T) => string) => {
   return out;
 };
 
-const cityNamePool = uniqueBy(
-  [
-    'Yangon',
-    'Mandalay',
-    'Naypyitaw'
-  ],
-  (s) => s.toLowerCase()
+const cityNamePool = uniqueBy([...SEED_CITY_NAMES], (s) => s.toLowerCase());
+
+const regionNamePool = uniqueBy(['Ayeyarwady', 'Rakhine', 'Tanintharyi'], (s) =>
+  s.toLowerCase()
 );
 
-const regionNamePool = uniqueBy(
-  [
-    'Ayeyarwady',
-    'Rakhine',
-    'Tanintharyi',
-    
-  ],
-  (s) => s.toLowerCase()
-);
-
-const beachNamePool = uniqueBy(
-  [
-    'Chaung Thar',
-    'Ngwe Saung',
-    'Goyangyi',
-    'Ngapali',
-    'Sittwe',
-    'Gwa',
-    'Kyeintali',
-    'Kantharyar',
-    'Nabule',
-    'Pa Nyint',
-    'Grandfather Beach',
-    'Maungmagan',
-    'Boulder Bay Island',
-    'Naung Oo Phee',
-    'Paradise Beach'
-  ],
-  (s) => s.toLowerCase()
-);
+const beachNamePool = uniqueBy([...SEED_BEACH_NAMES], (s) => s.toLowerCase());
 
 /** Myanmar-style business names (hotels / restaurants). */
 const MYANMAR_HOTEL_NAMES = [
@@ -174,7 +148,9 @@ type SeedFoodPriceSnapshot = Record<
   }
 >;
 
-async function tryReadJSON<T>(relativePathFromSeedDir: string): Promise<T | null> {
+async function tryReadJSON<T>(
+  relativePathFromSeedDir: string
+): Promise<T | null> {
   try {
     const abs = path.resolve(__dirname, relativePathFromSeedDir);
     const raw = await readFile(abs, 'utf8');
@@ -220,16 +196,25 @@ function estimateFoodPriceMMK() {
 }
 
 async function main() {
-  const shouldDrop = process.env.SEED_DROP ? toBool(process.env.SEED_DROP) : true;
+  const shouldDrop = process.env.SEED_DROP
+    ? toBool(process.env.SEED_DROP)
+    : true;
   const seedDays = Number(process.env.SEED_DAYS ?? 14);
   const departureTimes = ['08:00', '17:00'] as const;
   const busSeats = 44; // system constraint: 2+2 express (11 rows x 4)
 
-  const [priceSnapshot, routeMetricsSnapshot, foodPriceSnapshot] = await Promise.all([
-    tryReadJSON<SeedTicketPriceSnapshot>('data/ticketPrices.mmbusticket.snapshot.json'),
-    tryReadJSON<SeedRouteMetricsSnapshot>('data/routeMetrics.googlemaps.snapshot.json'),
-    tryReadJSON<SeedFoodPriceSnapshot>('data/foodPrices.foodpanda.snapshot.json'),
-  ]);
+  const [priceSnapshot, routeMetricsSnapshot, foodPriceSnapshot] =
+    await Promise.all([
+      tryReadJSON<SeedTicketPriceSnapshot>(
+        'data/ticketPrices.mmbusticket.snapshot.json'
+      ),
+      tryReadJSON<SeedRouteMetricsSnapshot>(
+        'data/routeMetrics.googlemaps.snapshot.json'
+      ),
+      tryReadJSON<SeedFoodPriceSnapshot>(
+        'data/foodPrices.foodpanda.snapshot.json'
+      ),
+    ]);
 
   await connectDB();
 
@@ -254,10 +239,14 @@ async function main() {
   }
 
   // Cities
-  const cityDocs = await City.insertMany(cityNamePool.map((cityName) => ({ cityName })));
+  const cityDocs = await City.insertMany(
+    cityNamePool.map((cityName) => ({ cityName }))
+  );
 
   // Regions
-  const regionDocs = await Region.insertMany(regionNamePool.map((regionName) => ({ regionName })));
+  const regionDocs = await Region.insertMany(
+    regionNamePool.map((regionName) => ({ regionName }))
+  );
 
   // Beaches - attach random region (kept simple unless you want a strict mapping)
   const beachDocs = await Beach.insertMany(
@@ -277,12 +266,18 @@ async function main() {
   // Distance/duration:
   // - Prefer Google Maps snapshot if provided (routeMetrics.googlemaps.snapshot.json)
   // - Otherwise use a safe heuristic so the seed still runs without API keys/snapshots.
-  const routesToCreate: Array<{ source: any; destination: any; duration: number; distance: number }> = [];
+  const routesToCreate: Array<{
+    source: any;
+    destination: any;
+    duration: number;
+    distance: number;
+  }> = [];
   for (const city of cityDocs as any[]) {
     for (const beach of beachDocs as any[]) {
       const key = routeKey(city.cityName, beach.beachName);
       const metrics = routeMetricsSnapshot?.[key];
-      const distanceMiles = metrics?.distanceMiles ?? faker.number.int({ min: 60, max: 520 });
+      const distanceMiles =
+        metrics?.distanceMiles ?? faker.number.int({ min: 60, max: 520 });
       const durationMins =
         metrics?.durationMins ??
         faker.number.int({
@@ -317,6 +312,16 @@ async function main() {
   const cityById = new Map(cityDocs.map((c: any) => [c._id.toString(), c]));
   const beachById = new Map(beachDocs.map((b: any) => [b._id.toString(), b]));
 
+  /** One calendar date per day offset so each route+day has exactly two departures (08:00 + 17:00 buses). */
+  const departureDateForDayOffset = (dayOffset: number) => {
+    const base = new Date();
+    const d = new Date(
+      Date.UTC(base.getUTCFullYear(), base.getUTCMonth(), base.getUTCDate())
+    );
+    d.setUTCDate(d.getUTCDate() + dayOffset + 1);
+    return d;
+  };
+
   const ticketsToCreate: any[] = [];
   for (const bus of busDocs as any[]) {
     const route = routeById.get(bus.route.toString()) as any;
@@ -324,15 +329,17 @@ async function main() {
     const beach = beachById.get(route.destination.toString()) as any;
     const key = routeKey(city.cityName, beach.beachName);
     const snap = priceSnapshot?.[key];
-    const localMMK = Math.max(snap?.localMMK ?? estimateTicketPriceMMK(route.distance, false), 41000);
-    const foreignerMMK = Math.max(snap?.foreignerMMK ?? estimateTicketPriceMMK(route.distance, true), 41000);
+    const localMMK = Math.max(
+      snap?.localMMK ?? estimateTicketPriceMMK(route.distance, false),
+      41000
+    );
 
-    const days = Number.isFinite(seedDays) && seedDays > 0 ? Math.floor(seedDays) : 14;
+    const days =
+      Number.isFinite(seedDays) && seedDays > 0 ? Math.floor(seedDays) : 14;
     for (let d = 0; d < days; d++) {
-      const departureDate = faker.date.soon({ days: d + 1 });
-      // Local ticket
+      const departureDate = departureDateForDayOffset(d);
       ticketsToCreate.push({
-        ticketName: `Ticket ${city.cityName} → ${beach.beachName} (${bus.departureTime})`,
+        ticketName: `${city.cityName} → ${beach.beachName} · ${bus.departureTime}`,
         busId: bus._id,
         source: city.cityName,
         destination: beach.beachName,
@@ -340,17 +347,6 @@ async function main() {
         ticketPrice: localMMK,
         noOfPassenger: faker.number.int({ min: 1, max: 4 }),
         isForeigner: false,
-      });
-      // Foreigner ticket
-      ticketsToCreate.push({
-        ticketName: `Ticket ${city.cityName} → ${beach.beachName} (${bus.departureTime})`,
-        busId: bus._id,
-        source: city.cityName,
-        destination: beach.beachName,
-        departureDate,
-        ticketPrice: foreignerMMK,
-        noOfPassenger: faker.number.int({ min: 1, max: 4 }),
-        isForeigner: true,
       });
     }
   }
@@ -373,10 +369,13 @@ async function main() {
   const restaurantsToCreate: any[] = [];
   (beachDocs as any[]).forEach((beach, beachIndex) => {
     const beachRegion =
-      regionDocs.find((r: any) => r._id.equals(beach.region)) ?? faker.helpers.arrayElement(regionDocs);
+      regionDocs.find((r: any) => r._id.equals(beach.region)) ??
+      faker.helpers.arrayElement(regionDocs);
     for (let idx = 0; idx < 4; idx++) {
       const nameFromPool =
-        MYANMAR_RESTAURANT_NAMES[(beachIndex * 4 + idx) % MYANMAR_RESTAURANT_NAMES.length];
+        MYANMAR_RESTAURANT_NAMES[
+          (beachIndex * 4 + idx) % MYANMAR_RESTAURANT_NAMES.length
+        ];
       restaurantsToCreate.push({
         restaurantName: `${nameFromPool} · ${beach.beachName}`,
         region: beachRegion._id,
@@ -417,7 +416,10 @@ async function main() {
       const band = foodPriceSnapshot?.[baseName];
       const price =
         band != null
-          ? roundTo(faker.number.int({ min: band.minMMK, max: band.maxMMK }), 100)
+          ? roundTo(
+              faker.number.int({ min: band.minMMK, max: band.maxMMK }),
+              100
+            )
           : estimateFoodPriceMMK();
       foodsToCreate.push({
         restaurant: r._id,
@@ -433,7 +435,9 @@ async function main() {
   (beachDocs as any[]).forEach((beach, beachIndex) => {
     for (let idx = 0; idx < 4; idx++) {
       const nameFromPool =
-        MYANMAR_HOTEL_NAMES[(beachIndex * 4 + idx) % MYANMAR_HOTEL_NAMES.length];
+        MYANMAR_HOTEL_NAMES[
+          (beachIndex * 4 + idx) % MYANMAR_HOTEL_NAMES.length
+        ];
       hotelsToCreate.push({
         hotelName: `${nameFromPool} · ${beach.beachName}`,
         beach: beach._id,
@@ -464,17 +468,23 @@ async function main() {
   const guidesToCreate: any[] = [];
   (beachDocs as any[]).forEach((beach, beachIndex) => {
     for (let g = 0; g < 4; g++) {
-      const first = MYANMAR_GUIDE_FIRST_NAMES[(beachIndex * 4 + g) % MYANMAR_GUIDE_FIRST_NAMES.length];
+      const first =
+        MYANMAR_GUIDE_FIRST_NAMES[
+          (beachIndex * 4 + g) % MYANMAR_GUIDE_FIRST_NAMES.length
+        ];
       guidesToCreate.push({
         name: `${first} ${String.fromCharCode(65 + g)}`,
         beach: beach._id,
         phone: myanmarMobilePhone(),
         experienceYears: faker.number.int({ min: 2, max: 12 }),
         gender: g % 2 === 0 ? TourGuideGender.Female : TourGuideGender.Male,
-        languages: faker.helpers.arrayElements(['Burmese', 'English', 'French', 'Spanish'], {
-          min: 2,
-          max: 4,
-        }),
+        languages: faker.helpers.arrayElements(
+          ['Burmese', 'English', 'French', 'Spanish'],
+          {
+            min: 2,
+            max: 4,
+          }
+        ),
         pricePerDay: faker.number.int({ min: 45000, max: 95000 }),
         currency: 'MMK',
         availability: TourGuideAvailability.Available,
@@ -485,18 +495,17 @@ async function main() {
   const tourGuideDocs = await TourGuide.insertMany(guidesToCreate);
 
   // Travel packages: one per city→beach route; totals from bus + hotel (nights) + transfers
-  const firstLocalTicketByRoute = new Map<string, any>();
+  const firstTicketByRoute = new Map<string, any>();
   for (const t of ticketDocs as any[]) {
-    if (t.isForeigner) continue;
     const rk = `${t.source}__${t.destination}`;
-    if (!firstLocalTicketByRoute.has(rk)) firstLocalTicketByRoute.set(rk, t);
+    if (!firstTicketByRoute.has(rk)) firstTicketByRoute.set(rk, t);
   }
 
   const packagesToCreate: any[] = [];
   for (const city of cityDocs as any[]) {
     for (const beach of beachDocs as any[]) {
       const rk = `${city.cityName}__${beach.beachName}`;
-      const ticket = firstLocalTicketByRoute.get(rk);
+      const ticket = firstTicketByRoute.get(rk);
       const hotelsOnBeach = (hotelDocs as any[]).filter(
         (h) => h.beach.toString() === beach._id.toString()
       );
@@ -508,14 +517,19 @@ async function main() {
       );
       const avgRoom =
         roomsOnHotel.length > 0
-          ? roomsOnHotel.reduce((s, rr) => s + rr.roomPricePerNight, 0) / roomsOnHotel.length
+          ? roomsOnHotel.reduce((s, rr) => s + rr.roomPricePerNight, 0) /
+            roomsOnHotel.length
           : 280000;
 
       const nights = 2;
-      const feePerNightPerPerson = Math.max(roundTo(Math.ceil(avgRoom / 2), 1000), 210000);
+      const feePerNightPerPerson = Math.max(
+        roundTo(Math.ceil(avgRoom / 2), 1000),
+        210000
+      );
       const transferFee = faker.number.int({ min: 75000, max: 120000 });
       const busPrice = ticket.ticketPrice as number;
-      const pricePerPerson = busPrice + nights * feePerNightPerPerson + transferFee;
+      const pricePerPerson =
+        busPrice + nights * feePerNightPerPerson + transferFee;
 
       const departOnDate = new Date();
       departOnDate.setDate(departOnDate.getDate() + 21);
@@ -584,4 +598,3 @@ main().catch(async (err) => {
     process.exit(1);
   }
 });
-

@@ -3,6 +3,7 @@ import asyncHandler from 'express-async-handler';
 import {
   createRoomService,
   getAllRoomsService,
+  getRoomsByHotelService,
   getRoomsByRoomTypeService,
   getRoomByIdService,
   updateRoomService,
@@ -40,6 +41,18 @@ export const getRoomsByRoomType = asyncHandler(async (req: Request, res: Respons
     success: true,
     status: 200,
     message: 'Rooms filtered by type displayed',
+    ...result,
+  });
+});
+
+export const getRoomsByHotel = asyncHandler(async (req: Request, res: Response) => {
+  const q = req.query as { hotelId: string };
+  const pagination = parsePagination(req.query);
+  const result = await getRoomsByHotelService(q.hotelId, pagination);
+  res.status(200).json({
+    success: true,
+    status: 200,
+    message: 'Rooms for hotel displayed',
     ...result,
   });
 });

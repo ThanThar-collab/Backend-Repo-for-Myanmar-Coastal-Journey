@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
   createRoom,
   getAllRooms,
+  getRoomsByHotel,
   getRoomsByRoomType,
   getRoomById,
   updateRoom,
@@ -15,9 +16,17 @@ import {
   listRoomsQuerySchema,
   getRoomByIdParamsSchema,
   roomsByRoomTypeQuerySchema,
+  roomsByHotelQuerySchema,
 } from '../validations/roomSchema';
 
 const roomRouter = Router();
+
+/** Public catalog: rooms for a hotel (mobile browse). */
+roomRouter.get(
+  '/filter/hotel',
+  validate(roomsByHotelQuerySchema, 'query'),
+  getRoomsByHotel
+);
 
 roomRouter.post('/', authenticateToken, validate(createRoomSchema, 'body'), createRoom);
 roomRouter.get('/', authenticateToken, validate(listRoomsQuerySchema, 'query'), getAllRooms);
